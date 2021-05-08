@@ -1,0 +1,1 @@
+Loyihani qaytadan boshladik
