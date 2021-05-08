@@ -1,5 +1,6 @@
 import logging
 
+
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from tg.views import DbHelper
@@ -33,9 +34,9 @@ def start(update,context):
     return 1
 
 def buyurtma(update, context):
-    db.category_parent()
-    for data in category_parent:
-        print("mana datalar", data)
+    category=db.category_parent()
+    for data in category:
+        print("mana data",data[1])
     update.message.reply_html('buyurtmaga keldim')
 
 

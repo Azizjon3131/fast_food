@@ -20,7 +20,7 @@ class Product(models.Model):
     description=models.CharField(max_length=500)
     price=models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE,null=True, blank=True)
-    product_type = models.ForeignKey(Product_type, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(Product_type, on_delete=models.CASCADE,null=True, blank=True)
 
 
     def __str__(self):
