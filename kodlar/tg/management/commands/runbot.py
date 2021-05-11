@@ -40,7 +40,8 @@ class Command(BaseCommand):
                     MessageHandler(Filters.regex('^(🛒 Buyurtma qilish)$'), buyurtma)
                 ],
                 3:[
-                    MessageHandler(Filters.regex('📍 Geo locatsiya yuborish'),qabul),
+                    MessageHandler(Filters.location('📍 Geo locatsiya yuborish'),qabul),
+                    MessageHandler(Filters.contact('📞 Telefon nomer'),qabul),
                     MessageHandler(Filters.regex('⬅️Ortga'),start),
                 ],
 

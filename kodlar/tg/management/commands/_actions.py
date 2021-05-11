@@ -1,6 +1,6 @@
 import logging
 
-
+import telegram
 from telegram import Update, ReplyKeyboardMarkup,InlineKeyboardMarkup,InlineKeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from tg.views import DbHelper,DbHelper2
@@ -132,7 +132,7 @@ def inline_menu(update,context):
             sena=int(data_split[2])*int(product[0]['price'])
             jami=sena+int(9000)
             st+=f"""
-            Savatchada: {x} ✖️{product[0]['name']}\nMahsulot: {sena} so'm\nYetkazib berish: 9000 so'm\nJami: {jami} so'm"""
+            Savatchada:\n\n {x} ✖️{product[0]['name']}\nMahsulot: {sena} so'm\nYetkazib berish: 9000 so'm\nJami: {jami} so'm"""
 
             query.message.delete()
             query.message.reply_text(st, reply_markup=InlineKeyboardMarkup(buttons))
@@ -143,16 +143,18 @@ def inline_menu(update,context):
             for i in data:
                 for j in range(1, len(bt) + 2):
                     if j == i[2]:
-                        x = bt[j-1]
                         s+=i[1]*i[2]
-                        dt+=f"""{i[2]} ✖ {i[3]} """+'\n'
-            xt=''
-            for j in range(1, len(bt) + 2):
-                if j == int(data_split[2]):
-                    xt = bt[j-1]
+                        dt+=f"""{bt[j-1]} ✖ {i[3]} """+'\n'
 
-            dt+=f"{xt} ✖️{product[0]['name']}"
-            s+=int(data_split[2])*int(product[0]['price'])
+            if data_split[3]!='save':
+                xt=''
+                for j in range(1, len(bt) + 2):
+                    if j == int(data_split[2]):
+                        xt = bt[j-1]
+
+                dt+=f"{xt} ✖️{product[0]['name']}"
+                s+=int(data_split[2])*int(product[0]['price'])
+
             ss=s+int(9000)
             st=f"""Savatchada:\n \n {dt}\n Mahsulotlar: {s} so'm \n Yetkazib berish: 9000\n Jami:{ss} so'm"""
 
@@ -174,18 +176,16 @@ def inline_menu(update,context):
                     s = 0
                     dt = ''
                     ss=0
-                    x=''
                     for i in data:
                         for j in range(1, len(bt) + 2):
                             if j == i[2]:
-                                x = bt[j - 1]
                                 s += i[1] * i[2]
-                                dt += f"""{x} ✖ {i[3]} """ + '\n'
+                                dt += f"""{bt[j-1]} ✖ {i[3]} """ + '\n'
                     ss=s+int(9000)
                     st = f"""Savatchada:\n \n {dt}\n Mahsulotlar: {s} so'm \n Yetkazib berish: 9000\n Jami:{ss} so'm"""
 
                     but=[
-                        InlineKeyboardButton('⬅️Ortga', callback_data=f'product2_{product[0]["product_type"]}_{int(data_split[3])}'),
+                        InlineKeyboardButton('⬅️Ortga', callback_data=f'product2_{product[0]["product_type"]}_{int(data_split[4])}_save'),
                         InlineKeyboardButton('🚖 ️Buyurtma berish', callback_data=f'buyurtma_data'),
                     ]
                     butt=[
@@ -222,12 +222,12 @@ def inline_menu(update,context):
                             if j == i[2]:
                                 x = bt[j - 1]
                                 s += i[1] * i[2]
-                                dt += f"""{bt[2]} ✖ {i[3]} """ + '\n'
+                                dt += f"""{x} ✖ {i[3]} """ + '\n'
                     ss = s + int(9000)
                     st = f"""Savatchada:\n \n {dt}\n Mahsulotlar: {s} so'm \n Yetkazib berish: 9000\n Jami:{ss} so'm"""
 
                     but = [
-                        InlineKeyboardButton('⬅️Ortga', callback_data=f'product2_{product[0]["product_type"]}_{int(data_split[3])}'),
+                        InlineKeyboardButton('⬅️Ortga', callback_data=f'product2_{product[0]["product_type"]}_{int(data_split[3])}_txt'),
                         InlineKeyboardButton('🚖 ️Buyurtma berish', callback_data=f'buyurtma_data'),
                     ]
                     butt = [
@@ -260,7 +260,8 @@ def inline_menu(update,context):
     if data_split[0]=='buyurtma':
 
         button=[
-            ["📍 Geo locatsiya yuborish"],
+            [telegram.KeyboardButton(text="📍 Geo locatsiya yuborish", request_location=True)],
+            [telegram.KeyboardButton(text="📞 Telefon nomer", request_contact=True)],
             ["⬅️Ortga"]
         ]
         query.message.delete()
@@ -270,7 +271,20 @@ def inline_menu(update,context):
         return 3
 
 def qabul(update,context):
-    update.message.reply_html("Sizning buyurtmangiz qabul qilindi. Tez orada yetkazib beramiz")
+    update.message.reply_html('OK keldim')
+
+    # bot=telegram.Bot('1676259797:AAEXXQUC-j2Gt05KOaF5m5IBBhppBqeZA3s')
+    # if bot.get_updates():
+    #     chat_id=bot.get_updates()[-1].message.chat_id
+    #     location_keyboard=telegram.KeyboardButton(text="send_location", request_location=True)
+    #     contact_keyboard=telegram.KeyboardButton(text="send_contact", request_contact=True)
+    #     custom_keyboard=[[location_keyboard, contact_keyboard]]
+    #     reply_murkup=telegram.ReplyKeyboardMarkup(custom_keyboard)
+
+    #     bot.send_message(chat_id=chat_id, text="YUboring", reply_murkup=reply_murkup)
+    #
+    # else:
+    #     print("Xatolik")
 
 
 def buyurtmalarim(update,context):
@@ -316,7 +330,7 @@ def render_number(id):
     button=[]
     buttons=[]
     for i in range(1,10):
-        button.append(InlineKeyboardButton(str(i), callback_data=f"product2_{id}_{i}"))
+        button.append(InlineKeyboardButton(str(i), callback_data=f"product2_{id}_{i}_txt"))
         if len(button)==3:
             buttons.append(button)
             button=[]
