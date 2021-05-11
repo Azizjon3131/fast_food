@@ -1,11 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from ._actions import start,cancel,echo,buyurtmalarim,oila,fikr,sozlama,buyurtma
+from ._actions import start,cancel,echo,buyurtmalarim,oila,fikr,sozlama,buyurtma,inline_menu,qabul
 from django.conf import settings
 import logging
 
 from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
+from telegram.ext import (Updater, CommandHandler,
+    MessageHandler, Filters, CallbackContext,
+    ConversationHandler,CallbackQueryHandler)
 
 # Enable logging
 logging.basicConfig(
@@ -23,6 +25,7 @@ class Command(BaseCommand):
 
         covn_handler = ConversationHandler(
             entry_points=[CommandHandler('start', start),
+                          MessageHandler(Filters.regex('🛒 Buyurtma qilish'), buyurtma),
                           ],
             states={
                 1: [
@@ -31,6 +34,14 @@ class Command(BaseCommand):
                     MessageHandler(Filters.regex('👨‍👨‍👧‍👧 EVOS Oilasi'), oila),
                     MessageHandler(Filters.regex('📝 Fikr bildirish'), fikr),
                     MessageHandler(Filters.regex('⚙ Sozlamalar'), sozlama),
+                ],
+                2:[
+                    CallbackQueryHandler(inline_menu),
+                    MessageHandler(Filters.regex('^(🛒 Buyurtma qilish)$'), buyurtma)
+                ],
+                3:[
+                    MessageHandler(Filters.regex('📍 Geo locatsiya yuborish'),qabul),
+                    MessageHandler(Filters.regex('⬅️Ortga'),start),
                 ],
 
             },
@@ -43,5 +54,5 @@ class Command(BaseCommand):
         updater.start_polling()
 
         updater.idle()
-        
+
         self.stdout.write(self.style.SUCCESS('Shu yer Ishladi'))

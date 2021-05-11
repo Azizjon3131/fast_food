@@ -6,15 +6,14 @@ from rest_framework.response import Response
 from .serializer import CategorySerializer,ProductSerializer,Product_typeSerializer,Product_imageSerializer
 from catalog.models import Category,Product,Product_type,Product_image
 
+
 class Category_ParentViews(generics.ListAPIView):
     serializer_class = CategorySerializer
-
     def get_queryset(self):
         queryset = Category.objects.all()
         queryset=queryset.filter(parent_id=None)
 
         return queryset
-
 
 
 class Category_ChildViews(generics.ListAPIView):
@@ -23,12 +22,29 @@ class Category_ChildViews(generics.ListAPIView):
     def get_queryset(self):
         queryset = Category.objects.all()
         id=self.request.query_params.get('id')
-        print("mana id", id)
         queryset=queryset.filter(parent_id=id)
 
         return queryset
 
+class CategoryViews(generics.ListAPIView):
+    serializer_class = CategorySerializer
 
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        id=self.request.query_params.get('id')
+        queryset=queryset.filter(id=id)
+
+        return queryset
+
+class Product1Views(generics.ListAPIView):
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        id=self.request.query_params.get('id')
+        queryset=queryset.filter(id=id)
+
+        return queryset
 
 class TypeViews(generics.ListAPIView):
     serializer_class = Product_typeSerializer
@@ -41,14 +57,12 @@ class TypeViews(generics.ListAPIView):
 
         return queryset
 
-
 class ProductViews(generics.ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
         queryset = Product.objects.all()
         category_id=self.request.query_params.get('id')
-        print("mana id", id)
         queryset=queryset.filter(category_id=category_id)
 
         return queryset
@@ -63,18 +77,6 @@ class Product_imageViews(generics.ListAPIView):
         queryset=queryset.filter(product_id=product_id)
 
         return queryset
-
-
-
-
-
-
-
-
-
-
-
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -100,7 +102,6 @@ class CategoryView(APIView):
 
 
     def post(self, request):
-        print('keldimku')
         serializer=CategoriSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         category = serializer.create(serializer.data)
