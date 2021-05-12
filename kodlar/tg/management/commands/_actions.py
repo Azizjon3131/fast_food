@@ -7,6 +7,8 @@ from tg.views import DbHelper,DbHelper2
 db=DbHelper()
 db2=DbHelper2()
 
+data=[]
+
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -17,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def start(update,context):
+
     main_button=[
         ['🛒 Buyurtma qilish'],
         [
@@ -166,8 +169,8 @@ def inline_menu(update,context):
         buttons=[]
         button=[]
         user_id = query.from_user.id
-        product = db.product2(int(data_split[4]))
         if data_split[1]=='txt':
+            product = db.product2(int(data_split[4]))
             if data_split[2]=='txt':
                 db2.insert_data(int(product[0]['price']),int(data_split[3]),product[0]['name'],int(user_id))
                 data=db2.read_product(int(user_id))
@@ -270,22 +273,45 @@ def inline_menu(update,context):
 
         return 3
 
+
+def location(update,context):
+    message = None
+    if update.edited_message:
+        message = update.edited_message
+    else:
+        message = update.message
+
+    current_pos = (message.location.latitude, message.location.longitude)
+    data.append(current_pos)
+
+    update.message.reply_html('Locatsiyangiz qabul qilindi endi telefon nomeringizni yuboring!')
+
+def contact(update,context):
+    user = update.message.from_user.id
+    data.append(update.message.contact.phone_number)
+
+    db2.catalog_contact_insert(data[0],data[1])
+    data.clear()
+
+
+    product=db2.read_product(user)
+
+    order=db2.read_product_contact(update.message.contact.phone_number)
+    print(type(order), order[0])
+    for data1 in product:
+        db2.insert_data2(int(data1[1]), int(data1[2]),data1[3],int(data1[4]), int(order[0]))
+
+    button=db2.read_orders_product(int(user))
+    s=0
+    for data2 in button:
+        s+=int(data2[1])*int(data2[2])
+
+    db2.catalog_conta_insert(s,update.message.contact.phone_number)
+
+    update.message.reply_html('OK 2 keldim')
+
 def qabul(update,context):
     update.message.reply_html('OK keldim')
-
-    # bot=telegram.Bot('1676259797:AAEXXQUC-j2Gt05KOaF5m5IBBhppBqeZA3s')
-    # if bot.get_updates():
-    #     chat_id=bot.get_updates()[-1].message.chat_id
-    #     location_keyboard=telegram.KeyboardButton(text="send_location", request_location=True)
-    #     contact_keyboard=telegram.KeyboardButton(text="send_contact", request_contact=True)
-    #     custom_keyboard=[[location_keyboard, contact_keyboard]]
-    #     reply_murkup=telegram.ReplyKeyboardMarkup(custom_keyboard)
-
-    #     bot.send_message(chat_id=chat_id, text="YUboring", reply_murkup=reply_murkup)
-    #
-    # else:
-    #     print("Xatolik")
-
 
 def buyurtmalarim(update,context):
     update.message.reply_html('buyurtmaga keldim')

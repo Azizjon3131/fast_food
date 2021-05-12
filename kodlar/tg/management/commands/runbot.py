@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from ._actions import start,cancel,echo,buyurtmalarim,oila,fikr,sozlama,buyurtma,inline_menu,qabul
+from ._actions import start,cancel,echo,buyurtmalarim,oila,fikr,sozlama,buyurtma,inline_menu,qabul, location,contact
 from django.conf import settings
 import logging
 
@@ -40,8 +40,8 @@ class Command(BaseCommand):
                     MessageHandler(Filters.regex('^(🛒 Buyurtma qilish)$'), buyurtma)
                 ],
                 3:[
-                    MessageHandler(Filters.location('📍 Geo locatsiya yuborish'),qabul),
-                    MessageHandler(Filters.contact('📞 Telefon nomer'),qabul),
+                    MessageHandler(Filters.location,location),
+                    MessageHandler(Filters.contact,contact),
                     MessageHandler(Filters.regex('⬅️Ortga'),start),
                 ],
 

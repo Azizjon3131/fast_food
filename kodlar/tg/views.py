@@ -2,6 +2,7 @@ from django.shortcuts import render
 import requests
 import psycopg2
 import psycopg2.extras
+from catalog.models import Orders,Orders_product
 
 class DbHelper:
 
@@ -12,12 +13,6 @@ class DbHelper:
     def product2(self,id):
         response=requests.get(f'http://127.0.0.1:8000/product/?id={id}')
         return response.json()
-
-
-
-
-
-
 
 
     def category_parent(self):
@@ -96,6 +91,45 @@ class DbHelper2:
         DELETE FROM orders WHERE id={id}
         """)
         self.conn.commit()
+
+    def catalog_contact_insert(self,location,contact):
+        self.cur.execute(f"""
+         INSERT INTO catalog_orders(location, phone_number)
+            VALUES({location},{contact})
+        """)
+        self.conn.commit()
+
+    def catalog_conta_insert(self,price_all,contact):
+        self.cur.execute(f"""
+        UPDATE catalog_orders SET price_all={price_all}  WHERE phone_number='{contact}'; 
+        """)
+        self.conn.commit()
+
+
+
+    def insert_data2(self,price,prise,product_name,user,id):
+        self.cur.execute(f"""
+        INSERT INTO catalog_orders_product(price,prise,product_name,user_id,orders_id)
+        VALUES({price},{prise},'{product_name}',{user}, {id})
+        """)
+        self.conn.commit()
+
+    def read_orders_product(self,id):
+        self.cur.execute(f"""
+        SELECT * FROM orders WHERE user_id={id}
+        """)
+        rows=self.cur.fetchall()
+        return rows
+
+    def read_product_contact(self,id):
+        self.cur.execute(f"""
+        SELECT * FROM catalog_orders WHERE phone_number='{id}'
+        """)
+        row=self.cur.fetchone()
+        return row
+
+
+
 
 
 

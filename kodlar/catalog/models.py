@@ -1,5 +1,33 @@
 from django.db import models
 
+
+
+class Orders(models.Model):
+    location=models.CharField(max_length=60,null=True,blank=True)
+    phone_number=models.CharField(max_length=20,null=True,blank=True)
+    price_all=models.IntegerField(null=True,blank=True)
+
+    def __str__(self):
+        return self.phone_number
+
+class Orders_product(models.Model):
+    orders=models.ForeignKey(Orders, on_delete=models.CASCADE)
+    price = models.IntegerField()
+    prise = models.IntegerField()
+    product_name = models.CharField(max_length=40)
+    user_id = models.IntegerField()
+
+
+    def __str__(self):
+        return self.product_name
+
+
+
+
+
+
+
+
 class Category(models.Model):
     name=models.CharField(max_length=50)
     icon=models.CharField(max_length=30)
